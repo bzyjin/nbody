@@ -120,24 +120,17 @@ impl Simulation {
         let aabb = crate::space::aabb(self.particles.iter().map(|object| object.pos));
 
         // Build quadtree
-        // let time = Instant::now();
         self.quadtree
             .clear()
             .set_pos(aabb.0)
             .set_size(aabb.1.component_max() + 1.0)
             .build_from_objects::<_, Sphere>(&self.particles, 0..self.particles.len());
-        // println!("build: {:?}", time.elapsed());
 
         // Compute field interactions
-        // let time = Instant::now();
         self.field.fill(Vec2::zero());
-
         self.reactions
             .clear()
             .compute_on(&self.particles, &mut self.quadtree, &mut self.field);
-        // println!("attract: {:?}", time.elapsed());
-
-        // println!("");
 
         for i in 0..self.particles.len() {
             self.particles[i].vel += self.field[i] * get_frame_time();
